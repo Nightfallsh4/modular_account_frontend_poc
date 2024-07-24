@@ -1,5 +1,5 @@
 export const domain = {
-	name: "Ether Mail",
+	name: "TokenShield",
 	version: "1",
 	chainId: 11155111,
 	verifyingContract: "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC",

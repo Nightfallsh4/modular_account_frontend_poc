@@ -1,3 +1,4 @@
+"use client"
 import { useWallets } from "@privy-io/react-auth"
 import { useEffect, useState } from "react"
 import { Address, createWalletClient, custom } from "viem"
