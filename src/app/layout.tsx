@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import Providers from "@/components/Provider"
+import { Box, Container } from "@mui/material"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
@@ -18,8 +19,9 @@ export default function RootLayout({
 		<html lang="en">
 			<Providers>
 				<body className={inter.className}>
-					
-					{children}
+					<Container sx={{ my: "5rem", backgroundColor: "black" }}>
+						<Box>{children}</Box>
+					</Container>
 				</body>
 			</Providers>
 		</html>

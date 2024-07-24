@@ -5,22 +5,18 @@ import LoginButton from "./LoginButton"
 export default function Navbar() {
 	return (
 		<>
-			<Container sx={{ my: "5rem", backgroundColor: "black" }}>
-				<Box>
-					<Grid container>
-						<Grid item xs={8}>
-							<Container>
-								<Typography variant="h3" component="h3">
-									Modular Account POC
-								</Typography>
-							</Container>
-						</Grid>
-						<Grid item xs={4}>
-							<LoginButton />
-						</Grid>
-					</Grid>
-				</Box>
-			</Container>
+			<Grid container>
+				<Grid item xs={8}>
+					<Container>
+						<Typography variant="h3" component="h3">
+							Modular Account POC
+						</Typography>
+					</Container>
+				</Grid>
+				<Grid item xs={4}>
+					<LoginButton />
+				</Grid>
+			</Grid>
 		</>
 	)
 }
