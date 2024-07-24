@@ -16,7 +16,7 @@ dependencies:
     version: 5.16.4(@emotion/react@11.13.0)(@emotion/styled@11.13.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1)
   '@privy-io/react-auth':
     specifier: ^1.76.1
-    version: 1.76.1(@babel/core@7.24.9)(@types/react@18.3.3)(react-dom@18.3.1)(react-is@16.13.1)(react@18.3.1)(typescript@5.5.4)
+    version: 1.76.1(@babel/core@7.24.9)(@types/react@18.3.3)(react-dom@18.3.1)(react-is@18.3.1)(react@18.3.1)(typescript@5.5.4)
   next:
     specifier: 14.2.5
     version: 14.2.5(@babel/core@7.24.9)(react-dom@18.3.1)(react@18.3.1)
@@ -26,6 +26,9 @@ dependencies:
   react-dom:
     specifier: ^18
     version: 18.3.1(react@18.3.1)
+  viem:
+    specifier: ^2.17.11
+    version: 2.17.11(typescript@5.5.4)
 
 devDependencies:
   '@types/node':
@@ -1493,7 +1496,7 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@privy-io/react-auth@1.76.1(@babel/core@7.24.9)(@types/react@18.3.3)(react-dom@18.3.1)(react-is@16.13.1)(react@18.3.1)(typescript@5.5.4):
+  /@privy-io/react-auth@1.76.1(@babel/core@7.24.9)(@types/react@18.3.3)(react-dom@18.3.1)(react-is@18.3.1)(react@18.3.1)(typescript@5.5.4):
     resolution: {integrity: sha512-F4tHyl3fOygHUw/d3NyZoqaVmzXvHawLRf1y7Wp80H9idIxktpVrEb9AuoAfnjsuvi3CmDAwa6CY5zJdzcj1Yg==}
     peerDependencies:
       react: ^18
@@ -1536,7 +1539,7 @@ packages:
       react-device-detect: 2.2.3(react-dom@18.3.1)(react@18.3.1)
       react-dom: 18.3.1(react@18.3.1)
       secure-password-utilities: 0.2.1
-      styled-components: 5.3.11(@babel/core@7.24.9)(react-dom@18.3.1)(react-is@16.13.1)(react@18.3.1)
+      styled-components: 5.3.11(@babel/core@7.24.9)(react-dom@18.3.1)(react-is@18.3.1)(react@18.3.1)
       tinycolor2: 1.6.0
       uuid: 9.0.1
       viem: 2.17.11(typescript@5.5.4)
@@ -1578,7 +1581,7 @@ packages:
   /@scure/bip32@1.4.0:
     resolution: {integrity: sha512-sVUpc0Vq3tXCkDGYVWGIZTRfnvu8LoTDaev7vbwh0omSvVORONr960MQWdKqJDCReIEmTj3PAr73O3aoxz7OPg==}
     dependencies:
-      '@noble/curves': 1.4.0
+      '@noble/curves': 1.4.2
       '@noble/hashes': 1.4.0
       '@scure/base': 1.1.7
     dev: false
@@ -2476,7 +2479,7 @@ packages:
       '@babel/plugin-syntax-jsx': 7.24.7(@babel/core@7.24.9)
       lodash: 4.17.21
       picomatch: 2.3.1
-      styled-components: 5.3.11(@babel/core@7.24.9)(react-dom@18.3.1)(react-is@16.13.1)(react@18.3.1)
+      styled-components: 5.3.11(@babel/core@7.24.9)(react-dom@18.3.1)(react-is@18.3.1)(react@18.3.1)
     transitivePeerDependencies:
       - '@babel/core'
       - supports-color
@@ -5610,7 +5613,7 @@ packages:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
 
-  /styled-components@5.3.11(@babel/core@7.24.9)(react-dom@18.3.1)(react-is@16.13.1)(react@18.3.1):
+  /styled-components@5.3.11(@babel/core@7.24.9)(react-dom@18.3.1)(react-is@18.3.1)(react@18.3.1):
     resolution: {integrity: sha512-uuzIIfnVkagcVHv9nE0VPlHPSCmXIUGKfJ42LNjxCCTDTL5sgnJ8Z7GZBq0EnLYGln77tPpEpExt2+qa+cZqSw==}
     engines: {node: '>=10'}
     peerDependencies:
@@ -5628,7 +5631,7 @@ packages:
       hoist-non-react-statics: 3.3.2
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      react-is: 16.13.1
+      react-is: 18.3.1
       shallowequal: 1.1.0
       supports-color: 5.5.0
     transitivePeerDependencies:

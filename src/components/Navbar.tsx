@@ -1,4 +1,6 @@
-import { Box, Button, Container, Grid, Typography } from "@mui/material"
+"use client"
+import { Box, Container, Grid, Typography } from "@mui/material"
+import LoginButton from "./LoginButton"
 
 export default function Navbar() {
 	return (
@@ -14,7 +16,7 @@ export default function Navbar() {
 							</Container>
 						</Grid>
 						<Grid item xs={4}>
-							<Button variant="contained">Login</Button>
+							<LoginButton />
 						</Grid>
 					</Grid>
 				</Box>
