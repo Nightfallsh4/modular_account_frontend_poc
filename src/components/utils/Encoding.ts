@@ -20,13 +20,15 @@ import {
 	TOKENSHIELD_SAFE_ADDRESS,
 } from "./constants"
 import { privateKeyToAddress } from "viem/accounts"
+import {
+	blockGuardSetterAbi,
+	erc20Abi,
+	launchpadAbi,
+	safeProxyFactoryAbi,
+	tsSafeAbi,
+} from "./abi"
 
 export function getSafe7579LaunchpadSetupData(userSigner: Address): Hex {
-	const abi = parseAbi([
-		//  ^? const abiItem: { name: "balanceOf"; type: "function"; stateMutability: "view";...
-		"function setupSafe(InitData calldata initData) external",
-		`struct InitData { address singleton; address[] owners; uint256 threshold; address setupTo; bytes setupData; ISafe7579 safe7579; ModuleInit[] validators; bytes callData; }`,
-	])
 	const validators = [
 		{
 			module: GUARDIAN_VALIDATOR,
@@ -38,7 +40,7 @@ export function getSafe7579LaunchpadSetupData(userSigner: Address): Hex {
 	]
 
 	const encodedLaunchSetupData = encodeFunctionData({
-		abi: abi,
+		abi: launchpadAbi,
 		functionName: "setupSafe",
 		args: [
 			{
@@ -58,14 +60,8 @@ export function getSafe7579LaunchpadSetupData(userSigner: Address): Hex {
 }
 
 export function getSetupData(): Hex {
-	const abi = parseAbi([
-		//  ^? const abiItem: { name: "balanceOf"; type: "function"; stateMutability: "view";...
-		"function initSafe7579(address safe7579, ModuleInit[] calldata executors, ModuleInit[] calldata fallbacks, ModuleInit[] calldata hooks, address[] calldata attesters, uint8 threshold) public",
-		`struct ModuleInit { address module; bytes initData; }`,
-	])
-
 	const encodedSetupData = encodeFunctionData({
-		abi: abi,
+		abi: launchpadAbi,
 		functionName: "initSafe7579",
 		args: [
 			TOKENSHIELD_SAFE_ADDRESS,
@@ -80,12 +76,6 @@ export function getSetupData(): Hex {
 }
 
 export function getCallExecutionData(): Hex {
-	const abi = parseAbi([
-		"function execute(bytes32 mode, bytes calldata executionCalldata) external payable",
-	])
-
-	const erc20Abi = parseAbi(["function mint(uint256 _amount) external"])
-
 	const mintEncodedData: Hex = encodeFunctionData({
 		abi: erc20Abi,
 		functionName: "mint",
@@ -93,7 +83,7 @@ export function getCallExecutionData(): Hex {
 	})
 
 	const encodedCallData: Hex = encodeFunctionData({
-		abi: abi,
+		abi: tsSafeAbi,
 		functionName: "execute",
 		args: [
 			getSimpleSingleMode(),
@@ -123,14 +113,6 @@ export function getFactoryInitializer(
 	blockGuardSetterAddress: Address,
 	blockSafeGuard: Address,
 ): Hex {
-	const launchpadAbi = parseAbi([
-		"function preValidationSetup( bytes32 initHash, address to, bytes calldata preInit ) external",
-	])
-
-	const blockGuardSetterAbi = parseAbi([
-		"function setGuard(address guard) external",
-	])
-
 	const setGuardEncodedData: Hex = encodeFunctionData({
 		abi: blockGuardSetterAbi,
 		functionName: "setGuard",
@@ -147,9 +129,6 @@ export function getFactoryInitializer(
 }
 
 export function getUserOpInitCode(factoryInitializer: Hex, salt: Hex): Hex {
-	const safeProxyFactoryAbi = parseAbi([
-		"function createProxyWithNonce(address _singleton, bytes memory initializer, uint256 saltNonce) public returns (SafeProxy proxy)",
-	])
 	const createProxyCalldata: Hex = encodeFunctionData({
 		abi: safeProxyFactoryAbi,
 		functionName: "createProxyWithNonce",
@@ -160,5 +139,5 @@ export function getUserOpInitCode(factoryInitializer: Hex, salt: Hex): Hex {
 		[SAFE_PROXY_FACTORY, createProxyCalldata],
 	)
 
-    return encodedInitCode
+	return encodedInitCode
 }

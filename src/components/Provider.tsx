@@ -2,7 +2,7 @@
 
 import { PrivyProvider } from "@privy-io/react-auth"
 
-import { sepolia, localhost } from "viem/chains"
+import { foundry } from "viem/chains"
 
 export default function Providers({ children }: { children: React.ReactNode }) {
 	return (
@@ -25,8 +25,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 					"discord",
 					"farcaster",
 				],
-                defaultChain: localhost,
-                supportedChains: [localhost],
+				defaultChain: foundry,
+				supportedChains: [foundry],
 				fundingMethodConfig: {
 					moonpay: {
 						useSandbox: true,
