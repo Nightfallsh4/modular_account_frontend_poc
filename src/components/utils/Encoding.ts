@@ -9,6 +9,7 @@ import {
 	parseAbiParameter,
 	encodePacked,
 	parseEther,
+	zeroAddress,
 } from "viem"
 import {
 	ERC20_TOKEN,
@@ -29,7 +30,31 @@ import {
 } from "./abi"
 
 export function getSafe7579LaunchpadSetupData(userSigner: Address): Hex {
-	const validators = [
+	const encodedLaunchSetupData = encodeFunctionData({
+		abi: launchpadAbi,
+		functionName: "setupSafe",
+		args: [getInitDataForLaunchPadSetup(userSigner)],
+	})
+
+	return encodedLaunchSetupData
+}
+
+export function getInitDataForLaunchPadSetup(userSigner: Address) {
+	return {
+		singleton: SAFE_SINGLETON,
+		owners: [userSigner],
+		threshold: hexToBigInt("0x01", { signed: true }),
+		setupTo: SAFE_LAUNCHPAD_7579,
+		setupData: getSetupData(),
+		safe7579: TOKENSHIELD_SAFE_ADDRESS,
+		validators: getValidators(userSigner),
+		callData: getCallExecutionData(),
+	}
+}
+export function getValidators(userSigner: Address) {
+	// console.log(userSigner);
+
+	return [
 		{
 			module: GUARDIAN_VALIDATOR,
 			initData: encodeAbiParameters(
@@ -38,27 +63,7 @@ export function getSafe7579LaunchpadSetupData(userSigner: Address): Hex {
 			),
 		},
 	]
-
-	const encodedLaunchSetupData = encodeFunctionData({
-		abi: launchpadAbi,
-		functionName: "setupSafe",
-		args: [
-			{
-				singleton: SAFE_SINGLETON,
-				owners: [userSigner],
-				threshold: hexToBigInt("0x1", { signed: true }),
-				setupTo: SAFE_LAUNCHPAD_7579,
-				setupData: getSetupData(),
-				safe7579: TOKENSHIELD_SAFE_ADDRESS,
-				validators: validators,
-				callData: getCallExecutionData(),
-			},
-		],
-	})
-
-	return encodedLaunchSetupData
 }
-
 export function getSetupData(): Hex {
 	const encodedSetupData = encodeFunctionData({
 		abi: launchpadAbi,
@@ -66,9 +71,9 @@ export function getSetupData(): Hex {
 		args: [
 			TOKENSHIELD_SAFE_ADDRESS,
 			[{ module: RECOVERY_MODULE, initData: "0x" }],
-			[{ module: "0x", initData: "0x" }],
-			[{ module: "0x", initData: "0x" }],
-			[privateKeyToAddress(keccak256("0x1234567"))],
+			[{ module: zeroAddress, initData: "0x" }],
+			[{ module: zeroAddress, initData: "0x" }],
+			[TOKENSHIELD_SAFE_ADDRESS],
 			1,
 		],
 	})
@@ -100,7 +105,13 @@ export function getCallExecutionData(): Hex {
 export function getSimpleSingleMode(): Hex {
 	return encodePacked(
 		["bytes1", "bytes1", "bytes4", "bytes4", "bytes22"],
-		["0x00", "0x00", "0x00000000", "0x00000000", "0x00"],
+		[
+			"0x00",
+			"0x00",
+			"0x00000000",
+			"0x00000000",
+			"0x00000000000000000000000000000000000000000000",
+		],
 	)
 }
 

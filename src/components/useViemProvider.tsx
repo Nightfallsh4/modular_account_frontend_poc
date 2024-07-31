@@ -2,7 +2,7 @@
 import { useWallets } from "@privy-io/react-auth"
 import { useEffect, useState } from "react"
 import { Address, createWalletClient, custom } from "viem"
-import { sepolia } from "viem/chains"
+import { foundry } from "viem/chains"
 
 export default function useViemProvider(isRendered:boolean) {
 	const [walletClient, setWalletClient] = useState<any>("")
@@ -22,7 +22,7 @@ export default function useViemProvider(isRendered:boolean) {
 			setWalletClient(
 				createWalletClient({
                     account:wallet.address as Address,
-					chain: sepolia,
+					chain: foundry,
 					transport: custom(provider),
 				}),
 			)

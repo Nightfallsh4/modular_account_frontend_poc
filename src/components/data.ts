@@ -3,7 +3,7 @@ import { getAddress, Address, Hex } from "viem"
 export const domain = {
 	name: "TokenShield",
 	version: "1",
-	chainId: 11155111,
+	chainId: 31337,
 	verifyingContract: "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC",
 } as const
 
