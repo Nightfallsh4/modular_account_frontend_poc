@@ -25,8 +25,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 					"discord",
 					"farcaster",
 				],
-                defaultChain: sepolia,
-                supportedChains: [sepolia, localhost],
+                defaultChain: localhost,
+                supportedChains: [localhost],
 				fundingMethodConfig: {
 					moonpay: {
 						useSandbox: true,

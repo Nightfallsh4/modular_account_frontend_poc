@@ -4,6 +4,7 @@ import useViemProvider from "./useViemProvider"
 import { domain, types } from "./data"
 import { useState } from "react"
 import { usePrivy } from "@privy-io/react-auth"
+import { keccak256 } from "viem"
 
 export default function SignButton() {
 	const { ready, authenticated } = usePrivy()
@@ -21,17 +22,16 @@ export default function SignButton() {
 				account: account[0],
 				domain,
 				types,
-				primaryType: "Mail",
+				primaryType: "UnsignedUserOperation",
 				message: {
-					from: {
-						name: "Cow",
-						wallet: "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
-					},
-					to: {
-						name: "Bob",
-						wallet: "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
-					},
-					contents: "Hello, Bob!",
+					sender: account[0],
+					nonce: 0,
+					initCode: "0xabcdf123456789",
+					callData: "0x",
+					accountGasLimits: keccak256("0x10000"),
+					preVerificationGas: 100000,
+					gasFees: keccak256("0x10000"),
+					paymasterAndData: "0x"
 				},
 			})
 			console.log("Signature- ")

@@ -1,9 +1,16 @@
 "use client"
 import { Button } from "@mui/material"
 import { usePrivy } from "@privy-io/react-auth"
+import { useEffect, useState } from "react"
 export default function LoginButton() {
+	const [disableLogin, setDisableLogin] = useState<boolean>(false)
 	const { ready, authenticated, login, logout } = usePrivy()
-	const disableLogin = !ready || (ready && authenticated)
+
+	useEffect(() => {
+		const disableLogin = !ready || (ready && authenticated)
+		setDisableLogin(disableLogin)
+	}, [ready, authenticated])
+	
 	return (
 		<>
 			{" "}
