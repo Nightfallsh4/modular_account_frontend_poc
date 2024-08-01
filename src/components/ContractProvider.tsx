@@ -12,8 +12,9 @@ interface ContextProps {
     setSAAddress: any;
     isLogin: boolean;
     walletClient: any;
+	initHash: Address;
 }
-const initialValue:ContextProps = {smartAccountAddress: "0x", setSAAddress:{}, isLogin: false, walletClient: {}}
+const initialValue:ContextProps = {smartAccountAddress: "0x", setSAAddress:{}, isLogin: false, walletClient: {}, initHash: "0x"}
 
 export const ContractContext = createContext(initialValue)
 
@@ -23,6 +24,7 @@ interface ContractProps {
 
 export default function ContractProvider({children}: ContractProps) {
     const [smartAccountAddress, setSAAddress] = useState<Address>("0x")
+	const [initHash, setInitHash] = useState<Address>("0x")
     const [isLogin, setisLogin] = useState<boolean>(false)
 	
 	const { ready, authenticated } = usePrivy()
@@ -43,7 +45,7 @@ export default function ContractProvider({children}: ContractProps) {
 			address: SAFE_LAUNCHPAD_7579,
 			abi: launchpadAbi,
 			functionName: "hash",
-			args: [getInitDataForLaunchPadSetup(walletClient.account?.address)],
+			args: [getInitDataForLaunchPadSetup(walletClient?.account?.address as Address)],
 		})
 		console.log("InitHash- ", initHash)
 
@@ -55,20 +57,21 @@ export default function ContractProvider({children}: ContractProps) {
 				SAFE_LAUNCHPAD_7579,
 				SAFE_PROXY_FACTORY,
 				SAFE_PROXY_CREATION_BYTECODE,
-				getSalt(await walletClient.address),
+				getSalt(walletClient?.account?.address as Address),
 				getFactoryInitializer(initHash, BLOCK_GUARD_SETTER, BLOCK_SAFE_GUARD),
 			],
 		})
 
 		console.log("Predicted Address- ", erc7579Address)
 
-		return erc7579Address
+		return {erc7579Address, initHash }
 	}
 	predictAddress().then((value) => {
-		setSAAddress(value)
+		setSAAddress(value.erc7579Address)
+		setInitHash(value.initHash)
 	})
 
-    const value = {smartAccountAddress, setSAAddress, isLogin, walletClient}
+    const value = {smartAccountAddress, setSAAddress, isLogin, walletClient, initHash}
 
 	return <ContractContext.Provider value={value}>{children}</ContractContext.Provider>
 }

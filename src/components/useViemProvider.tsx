@@ -1,11 +1,11 @@
 "use client"
 import { useWallets } from "@privy-io/react-auth"
 import { useEffect, useState } from "react"
-import { Address, createWalletClient, custom } from "viem"
+import { Address, createWalletClient, custom, WalletClient } from "viem"
 import { foundry } from "viem/chains"
 
 export default function useViemProvider(isRendered:boolean) {
-	const [walletClient, setWalletClient] = useState<any>("")
+	const [walletClient, setWalletClient] = useState<WalletClient>()
 	const { wallets } = useWallets()
 
 	useEffect(() => {
