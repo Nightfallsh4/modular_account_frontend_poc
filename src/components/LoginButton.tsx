@@ -1,25 +1,22 @@
 "use client"
 import { Button } from "@mui/material"
 import { usePrivy } from "@privy-io/react-auth"
-import { useEffect, useState } from "react"
+import { useContext } from "react"
+import { ContractContext } from "./ContractProvider"
 export default function LoginButton() {
-	const [disableLogin, setDisableLogin] = useState<boolean>(false)
-	const { ready, authenticated, login, logout } = usePrivy()
+	const {isLogin} = useContext(ContractContext)
+	const { login, logout } = usePrivy()
 
-	useEffect(() => {
-		const disableLogin = !ready || (ready && authenticated)
-		setDisableLogin(disableLogin)
-	}, [ready, authenticated])
 	
 	return (
 		<>
 			{" "}
-			{disableLogin ? (
+			{isLogin ? (
 				<Button variant="contained" onClick={logout}>
 					Logout
 				</Button>
 			) : (
-				<Button disabled={disableLogin} onClick={login} variant="contained">
+				<Button disabled={isLogin} onClick={login} variant="contained">
 					Login
 				</Button>
 			)}

@@ -1,4 +1,5 @@
 "use client"
+import ContractProvider from "@/components/ContractProvider"
 import PredictButton from "@/components/PredictButton"
 import dynamic from "next/dynamic"
 
@@ -7,10 +8,12 @@ const Navbar = dynamic(() => import("@/components/Navbar"), { ssr: false })
 const SendEth = dynamic(() => import("@/components/sendEth"), { ssr: false })
 export default function Home() {
 	return (
-		<>
-			<Navbar />
-			<SendEth />
-			<PredictButton />
-		</>
+		<ContractProvider>
+			<>
+				<Navbar />
+				<PredictButton />
+				<SendEth />
+			</>
+		</ContractProvider>
 	)
 }

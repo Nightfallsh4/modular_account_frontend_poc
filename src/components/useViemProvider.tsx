@@ -14,14 +14,14 @@ export default function useViemProvider(isRendered:boolean) {
 			console.log("Wallet from Privy")
 			console.log(wallet)
 
-			const provider = await wallet.getEthereumProvider()
+			const provider = await wallet?.getEthereumProvider()
             console.log("Provider from wallet Privy");
             
             console.log(provider)
             
 			setWalletClient(
 				createWalletClient({
-                    account:wallet.address as Address,
+                    account:wallet?.address as Address,
 					chain: foundry,
 					transport: custom(provider),
 				}),

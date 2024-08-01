@@ -1,6 +1,5 @@
-import { Box, Button, Container } from "@mui/material"
-import SignButton from "./SignButton"
-import { useEffect, useState } from "react"
+import { Box, Button, Container, Typography } from "@mui/material"
+import { useContext, useEffect, useState } from "react"
 import { usePrivy } from "@privy-io/react-auth"
 import { publicClient } from "./utils/clients"
 import {
@@ -17,50 +16,20 @@ import {
 	getSalt,
 } from "./utils/Encoding"
 import useViemProvider from "./useViemProvider"
+import { Address } from "viem"
+import { ContractContext } from "./ContractProvider"
 
 export default function PredictButton() {
-	const [isLogin, setisLogin] = useState<boolean>(false)
-	const { ready, authenticated } = usePrivy()
-	const walletClient = useViemProvider(isLogin)
+	const { isLogin, smartAccountAddress } = useContext(ContractContext)
 
-	const predictAddress = async () => {
-		console.log("Starting predict Address")
-		const initHash = await publicClient.readContract({
-			address: SAFE_LAUNCHPAD_7579,
-			abi: launchpadAbi,
-			functionName: "hash",
-			args: [getInitDataForLaunchPadSetup(walletClient.account.address)],
-		})
-		console.log("InitHash- ", initHash)
-
-		const data = await publicClient.readContract({
-			address: SAFE_LAUNCHPAD_7579,
-			abi: launchpadAbi,
-			functionName: "predictSafeAddress",
-			args: [
-				SAFE_LAUNCHPAD_7579,
-				SAFE_PROXY_FACTORY,
-				SAFE_PROXY_CREATION_BYTECODE,
-				getSalt(await walletClient.address),
-				getFactoryInitializer(initHash, BLOCK_GUARD_SETTER, BLOCK_SAFE_GUARD),
-			],
-		})
-
-		console.log("Predicted Address- ", data)
-	}
-
-	useEffect(() => {
-		const isLogin = !ready || (ready && authenticated)
-		setisLogin(isLogin)
-	}, [ready, authenticated])
 	return (
 		<>
 			<Container>
 				<Box>
 					{isLogin ? (
-						<Button variant="contained" onClick={predictAddress}>
-							Predict Address
-						</Button>
+						<Typography variant="h5" component="h5">
+							Address- {smartAccountAddress}
+						</Typography>
 					) : null}
 				</Box>
 			</Container>

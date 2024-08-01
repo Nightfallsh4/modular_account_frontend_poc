@@ -2,16 +2,13 @@
 import { Box, Container } from "@mui/material"
 import { usePrivy } from "@privy-io/react-auth"
 import SignButton from "./SignButton"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
+import { ContractContext } from "./ContractProvider"
 
 export default function SendEth() {
-	const [isLogin, setisLogin] = useState<boolean>(false)
+	const {isLogin} = useContext(ContractContext)
 	const { ready, authenticated } = usePrivy()
 
-	useEffect(() => {
-		const isLogin = !ready || (ready && authenticated)
-		setisLogin(isLogin)
-	}, [ready, authenticated])
 	
 	return (
 		<>

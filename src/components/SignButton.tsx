@@ -16,7 +16,7 @@ export default function SignButton() {
 	async function signTx() {
 		if (viemProvider) {
 			const account = await viemProvider.getAddresses()
-			console.log(account)
+			// console.log(account)
 
 			const signature = await viemProvider.signTypedData({
 				account: account[0],
