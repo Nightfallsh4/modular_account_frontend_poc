@@ -33,18 +33,18 @@ import {
 } from "./abi"
 import { foundry } from "viem/chains"
 
-export function getSafe7579LaunchpadSetupData(userSigner: Address): Hex {
+export function getSafe7579LaunchpadSetupData(userSigner: Address, ): Hex {
 	const encodedLaunchSetupData = encodeFunctionData({
 		abi: launchpadAbi,
 		functionName: "setupSafe",
-		args: [getInitDataForLaunchPadSetup(userSigner)],
+		args: [getInitDataForLaunchPadSetup(userSigner, ERC20_TOKEN, "13")],
 	})
-	console.log(encodedLaunchSetupData)
+	// console.log(encodedLaunchSetupData)
 
 	return encodedLaunchSetupData
 }
 
-export function getInitDataForLaunchPadSetup(userSigner: Address) {
+export function getInitDataForLaunchPadSetup(userSigner: Address, targetAddress: Address, valueToMint: string) {
 	return {
 		singleton: SAFE_SINGLETON,
 		owners: [userSigner],
@@ -53,7 +53,7 @@ export function getInitDataForLaunchPadSetup(userSigner: Address) {
 		setupData: getSetupData(),
 		safe7579: TOKENSHIELD_SAFE_ADDRESS,
 		validators: getValidators(userSigner),
-		callData: getCallExecutionData(),
+		callData: getMintCallExecutionData(targetAddress,valueToMint),
 	}
 }
 export function getValidators(userSigner: Address) {
@@ -88,13 +88,46 @@ export function getSetupData(): Hex {
 	return encodedSetupData
 }
 
-export function getCallExecutionData(): Hex {
+export function getMintCallExecutionData(tokenAddress: Address, mintValue: string): Hex {
 	const mintEncodedData: Hex = encodeFunctionData({
 		abi: erc20Abi,
 		functionName: "mint",
-		args: [parseEther("13")],
+		args: [parseEther(mintValue)],
 	})
 
+	const encodedCallData = getEncodedCallForExecute(
+		tokenAddress,
+		parseEther("0"),
+		mintEncodedData,
+	)
+
+	return encodedCallData
+}
+
+export function getTransferCallExecutionData(
+	tokenAddress: Address,
+	toAddress: Address,
+	etherValue: string,
+): Hex {
+	const transferEncodedData: Hex = encodeFunctionData({
+		abi: erc20Abi,
+		functionName: "transfer",
+		args: [toAddress, parseEther(etherValue)],
+	})
+
+	const encodedCalldata = getEncodedCallForExecute(
+		tokenAddress,
+		parseEther("0"),
+		transferEncodedData,
+	)
+	return encodedCalldata
+}
+
+export function getEncodedCallForExecute(
+	targetContract: Address,
+	value: bigint,
+	calldata: Hex,
+): Hex {
 	const encodedCallData: Hex = encodeFunctionData({
 		abi: tsSafeAbi,
 		functionName: "execute",
@@ -102,11 +135,10 @@ export function getCallExecutionData(): Hex {
 			getSimpleSingleMode(),
 			encodePacked(
 				["address", "uint256", "bytes"],
-				[ERC20_TOKEN, parseEther("0"), mintEncodedData],
+				[targetContract, value, calldata],
 			),
 		],
 	})
-
 	return encodedCallData
 }
 

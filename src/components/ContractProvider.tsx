@@ -4,6 +4,7 @@ import { publicClient } from "./utils/clients"
 import {
 	BLOCK_GUARD_SETTER,
 	BLOCK_SAFE_GUARD,
+	ERC20_TOKEN,
 	SAFE_LAUNCHPAD_7579,
 	SAFE_PROXY_CREATION_BYTECODE,
 	SAFE_PROXY_FACTORY,
@@ -64,13 +65,14 @@ export default function ContractProvider({ children }: ContractProps) {
 				args: [
 					getInitDataForLaunchPadSetup(
 						walletClient?.account?.address as Address,
+						ERC20_TOKEN, "13"
 					),
 				],
 			})
-			console.log("InitData- ")
-			console.log(
-				getInitDataForLaunchPadSetup(walletClient?.account?.address as Address),
-			)
+			// console.log("InitData- ")
+			// console.log(
+			// 	getInitDataForLaunchPadSetup(walletClient?.account?.address as Address, ERC20_TOKEN, "13"),
+			// )
 
 			console.log("InitHash- ", initHash)
 

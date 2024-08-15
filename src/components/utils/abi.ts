@@ -18,6 +18,7 @@ export const tsSafeAbi = parseAbi([
 export const erc20Abi = parseAbi([
 	"function mint(uint256 _amount) external",
 	"function balanceOf(address account) external view returns (uint256)",
+	"function transfer(address to, uint256 value) external returns (bool)"
 ])
 
 export const blockGuardSetterAbi = parseAbi([

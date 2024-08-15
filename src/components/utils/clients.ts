@@ -1,6 +1,7 @@
-import { createBundlerClient, ENTRYPOINT_ADDRESS_V07 } from "permissionless";
+import { createBundlerClient, ENTRYPOINT_ADDRESS_V07, providerToSmartAccountSigner } from "permissionless";
+import { SmartAccountSigner } from "permissionless/accounts";
 import { createPimlicoPaymasterClient } from "permissionless/clients/pimlico";
-import { http, createPublicClient } from "viem";
+import { http, createPublicClient, Hash, SignableMessage, TypedData, TypedDataDefinition } from "viem";
 import { foundry } from "viem/chains";
  
 export const publicClient = createPublicClient({
@@ -18,3 +19,5 @@ export const paymasterClient = createPimlicoPaymasterClient({
   transport: http("http://localhost:3000"), 
   entryPoint: ENTRYPOINT_ADDRESS_V07,
 });
+
+
