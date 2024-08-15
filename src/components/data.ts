@@ -1,21 +1,20 @@
 import { getAddress, Address, Hex } from "viem"
 
-export const domain = {
-	name: "TokenShield",
-	version: "1",
-	chainId: 31337,
-	verifyingContract: "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC",
-} as const
+
 
 export interface UnsignedUserOperation {
 	sender: Address
-	nonce: number
+	nonce: bigint
 	initCode: Hex
 	callData: Hex
 	accountGasLimits: Hex
-	preVerificationGas: number
+	preVerificationGas: bigint
 	gasFees: Hex
 	paymasterAndData: Hex
+}
+
+export interface SignedUserOp extends UnsignedUserOperation {
+	signature: Hex
 }
 
 // The named list of all type definitions

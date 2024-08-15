@@ -1,5 +1,4 @@
 import {
-	parseAbi,
 	Address,
 	encodeFunctionData,
 	hexToBigInt,
@@ -9,7 +8,11 @@ import {
 	parseAbiParameter,
 	encodePacked,
 	parseEther,
+	parseSignature,
 	zeroAddress,
+	parseAbiParameters,
+	WalletClient,
+	PublicClient,
 } from "viem"
 import {
 	ERC20_TOKEN,
@@ -28,6 +31,7 @@ import {
 	safeProxyFactoryAbi,
 	tsSafeAbi,
 } from "./abi"
+import { foundry } from "viem/chains"
 
 export function getSafe7579LaunchpadSetupData(userSigner: Address): Hex {
 	const encodedLaunchSetupData = encodeFunctionData({
@@ -35,6 +39,7 @@ export function getSafe7579LaunchpadSetupData(userSigner: Address): Hex {
 		functionName: "setupSafe",
 		args: [getInitDataForLaunchPadSetup(userSigner)],
 	})
+	console.log(encodedLaunchSetupData)
 
 	return encodedLaunchSetupData
 }
@@ -43,7 +48,7 @@ export function getInitDataForLaunchPadSetup(userSigner: Address) {
 	return {
 		singleton: SAFE_SINGLETON,
 		owners: [userSigner],
-		threshold: hexToBigInt("0x01", { signed: true }),
+		threshold: BigInt("1"),
 		setupTo: SAFE_LAUNCHPAD_7579,
 		setupData: getSetupData(),
 		safe7579: TOKENSHIELD_SAFE_ADDRESS,
@@ -70,11 +75,14 @@ export function getSetupData(): Hex {
 		functionName: "initSafe7579",
 		args: [
 			TOKENSHIELD_SAFE_ADDRESS,
-			[{ module: RECOVERY_MODULE, initData: "0x" }],
-			[{ module: zeroAddress, initData: "0x" }],
-			[{ module: zeroAddress, initData: "0x" }],
-			[TOKENSHIELD_SAFE_ADDRESS],
-			1,
+			[{ module: RECOVERY_MODULE, initData: "" as Hex }],
+			[],
+			[],
+			[
+				"0x1F8830562d09e0091c45C4497d578698D4CcA495",
+				"0x46b3351cEC2e2894fB86f516571c71af735129cc",
+			],
+			2,
 		],
 	})
 	return encodedSetupData
@@ -84,7 +92,7 @@ export function getCallExecutionData(): Hex {
 	const mintEncodedData: Hex = encodeFunctionData({
 		abi: erc20Abi,
 		functionName: "mint",
-		args: [parseEther("420")],
+		args: [parseEther("13")],
 	})
 
 	const encodedCallData: Hex = encodeFunctionData({
@@ -116,7 +124,7 @@ export function getSimpleSingleMode(): Hex {
 }
 
 export function getSalt(userAddress: Address): Hex {
-	return keccak256(`${userAddress}12345678`)
+	return keccak256(`${userAddress}`)
 }
 
 export function getFactoryInitializer(
@@ -151,4 +159,68 @@ export function getUserOpInitCode(factoryInitializer: Hex, salt: Hex): Hex {
 	)
 
 	return encodedInitCode
+}
+
+export function getDomain(verifyingAddress: Address) {
+	return {
+		name: "TokenShield",
+		version: "1",
+		chainId: foundry.id,
+		verifyingContract: verifyingAddress,
+	}
+}
+
+export function getFormattedSignature(userSig: Hex, guardianSig: Hex): Hex {
+	const sig1 = getSignatureSplit(userSig)
+	const sig2 = getSignatureSplit(guardianSig)
+	const v1 = sig1.yParity === 0 ? 27 : 28
+	const v2 = sig2.yParity === 0 ? 27 : 28
+	const encodedSignature = encodeAbiParameters(
+		parseAbiParameters(
+			"bytes32 r1, bytes32 s1, uint8 v1, bytes32 r2, bytes32 s2, uint8 v2",
+		),
+		[sig1.r, sig1.s, v1, sig2.r, sig2.s, v2],
+	)
+	console.log("R1- ", sig1.r)
+	console.log("S1- ", sig1.s)
+	console.log("V1- ", sig1.yParity)
+
+	console.log("R1- ", sig2.r)
+	console.log("S1- ", sig2.s)
+	console.log("V1- ", sig2.yParity)
+	return encodedSignature
+}
+
+export function getSignatureSplit(signature: Hex) {
+	return parseSignature(signature)
+}
+
+export async function readTokenBalance(
+	provider: PublicClient,
+	smartAccountAddress: Address,
+) {
+	const data = await provider.readContract({
+		address: ERC20_TOKEN,
+		abi: erc20Abi,
+		functionName: "balanceOf",
+		args: [smartAccountAddress],
+	})
+	return data
+}
+
+export async function getNonce(
+	provider: PublicClient,
+	smartAccountAddress: Address,
+	validatorAddress: Address,
+) {
+	const nonce = await provider.readContract({
+		address: TOKENSHIELD_SAFE_ADDRESS,
+		abi: tsSafeAbi,
+		functionName: "getNonce",
+		args: [smartAccountAddress, validatorAddress],
+	})
+	console.log("Nonce")
+	console.log(nonce)
+
+	return nonce
 }
