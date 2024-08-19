@@ -16,8 +16,8 @@ export async function fetchSignature(
 	// userOpData.append("preVerificationGas", `${userOp.preVerificationGas}`)
 	// userOpData.append("gasFees", `${userOp.gasFees}`)
 	// userOpData.append("paymasterAndData", `${userOp.paymasterAndData}`)
-	userOp.nonce = userOp.nonce.toString()
-	userOp.preVerificationGas = userOp.preVerificationGas.toString()
+	userOp.nonce = userOp.nonce
+	userOp.preVerificationGas = userOp.preVerificationGas
 	// const data = await fetch("/api/getSignature", {
 	// 	method: "POST",
 	// 	headers: { "Content-Type": "application/x-www-form-urlencoded" },

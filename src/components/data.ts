@@ -10,7 +10,6 @@ export interface UnsignedUserOperation {
 	accountGasLimits: Hex
 	preVerificationGas: bigint
 	gasFees: Hex
-	paymasterAndData: Hex
 }
 
 export interface SignedUserOp extends UnsignedUserOperation {
@@ -27,6 +26,5 @@ export const types = {
 		{ name: "accountGasLimits", type: "bytes32" },
 		{ name: "preVerificationGas", type: "uint256" },
 		{ name: "gasFees", type: "bytes32" },
-		{ name: "paymasterAndData", type: "bytes" },
 	],
 } as const

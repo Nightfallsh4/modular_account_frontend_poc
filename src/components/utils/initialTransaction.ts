@@ -67,7 +67,7 @@ export default async function initialTransactionSend(
 		),
 		preVerificationGas: hexToBigInt("0x1000000000"),
 		gasFees: padHex("0x01", { size: 32 }),
-		paymasterAndData: "" as Hex,
+		// paymasterAndData: "" as Hex,
 	}
 	const signature = await viemProvider.signTypedData({
 		account: owner,
@@ -94,7 +94,7 @@ export default async function initialTransactionSend(
 		accountGasLimits: userOp.accountGasLimits,
 		preVerificationGas: userOp.preVerificationGas,
 		gasFees: userOp.gasFees,
-		paymasterAndData: userOp.paymasterAndData,
+		paymasterAndData: '' as Hex,
 		signature: encodedSignature,
 	}
 	console.log("Token Balance Before Tx- ")

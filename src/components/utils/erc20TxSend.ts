@@ -45,7 +45,7 @@ export default async function erc20TxSend(
 		),
 		preVerificationGas: hexToBigInt("0x1000000000"),
 		gasFees: padHex("0x01", { size: 32 }),
-		paymasterAndData: "" as Hex,
+		// paymasterAndData: "" as Hex,
 	}
 
 	const signature = await viemProvider.signTypedData({
@@ -75,7 +75,7 @@ export default async function erc20TxSend(
 		accountGasLimits: userOp.accountGasLimits,
 		preVerificationGas: userOp.preVerificationGas,
 		gasFees: userOp.gasFees,
-		paymasterAndData: userOp.paymasterAndData,
+		paymasterAndData: "" as Hex,
 		signature: encodedSignature,
 	}
 	console.log("Token Balance Before Tx- ")

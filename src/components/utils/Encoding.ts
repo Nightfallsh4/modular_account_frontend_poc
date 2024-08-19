@@ -15,10 +15,13 @@ import {
 	PublicClient,
 } from "viem"
 import {
+	BLOCK_GUARD_SETTER,
+	BLOCK_SAFE_GUARD,
 	ERC20_TOKEN,
 	GUARDIAN_VALIDATOR,
 	RECOVERY_MODULE,
 	SAFE_LAUNCHPAD_7579,
+	SAFE_PROXY_CREATION_BYTECODE,
 	SAFE_PROXY_FACTORY,
 	SAFE_SINGLETON,
 	TOKENSHIELD_SAFE_ADDRESS,
@@ -32,8 +35,9 @@ import {
 	tsSafeAbi,
 } from "./abi"
 import { foundry } from "viem/chains"
+import { publicClient } from "./clients"
 
-export function getSafe7579LaunchpadSetupData(userSigner: Address, ): Hex {
+export function getSafe7579LaunchpadSetupData(userSigner: Address): Hex {
 	const encodedLaunchSetupData = encodeFunctionData({
 		abi: launchpadAbi,
 		functionName: "setupSafe",
@@ -44,7 +48,11 @@ export function getSafe7579LaunchpadSetupData(userSigner: Address, ): Hex {
 	return encodedLaunchSetupData
 }
 
-export function getInitDataForLaunchPadSetup(userSigner: Address, targetAddress: Address, valueToMint: string) {
+export function getInitDataForLaunchPadSetup(
+	userSigner: Address,
+	targetAddress: Address,
+	valueToMint: string,
+) {
 	return {
 		singleton: SAFE_SINGLETON,
 		owners: [userSigner],
@@ -53,7 +61,7 @@ export function getInitDataForLaunchPadSetup(userSigner: Address, targetAddress:
 		setupData: getSetupData(),
 		safe7579: TOKENSHIELD_SAFE_ADDRESS,
 		validators: getValidators(userSigner),
-		callData: getMintCallExecutionData(targetAddress,valueToMint),
+		callData: getMintCallExecutionData(targetAddress, valueToMint), //@follow-up calldata not there in library
 	}
 }
 export function getValidators(userSigner: Address) {
@@ -88,7 +96,10 @@ export function getSetupData(): Hex {
 	return encodedSetupData
 }
 
-export function getMintCallExecutionData(tokenAddress: Address, mintValue: string): Hex {
+export function getMintCallExecutionData(
+	tokenAddress: Address,
+	mintValue: string,
+): Hex {
 	const mintEncodedData: Hex = encodeFunctionData({
 		abi: erc20Abi,
 		functionName: "mint",
@@ -255,4 +266,54 @@ export async function getNonce(
 	console.log(nonce)
 
 	return nonce
+}
+
+export interface predictTsAddressReturn {
+	address: Address
+	initHash: Address
+}
+export async function predictTsAddress(
+	walletClient: WalletClient,
+): Promise<predictTsAddressReturn> {
+	console.log("Starting predict Address")
+	let address, initHash
+	if (walletClient?.account) {
+		initHash = await publicClient.readContract({
+			address: SAFE_LAUNCHPAD_7579,
+			abi: launchpadAbi,
+			functionName: "hash",
+			args: [
+				getInitDataForLaunchPadSetup(
+					walletClient?.account?.address as Address,
+					ERC20_TOKEN,
+					"13",
+				),
+			],
+		})
+		// console.log("InitData- ")
+		// console.log(
+		// 	getInitDataForLaunchPadSetup(walletClient?.account?.address as Address, ERC20_TOKEN, "13"),
+		// )
+
+		console.log("InitHash- ", initHash)
+
+		address = await publicClient.readContract({
+			address: SAFE_LAUNCHPAD_7579,
+			abi: launchpadAbi,
+			functionName: "predictSafeAddress",
+			args: [
+				SAFE_LAUNCHPAD_7579,
+				SAFE_PROXY_FACTORY,
+				SAFE_PROXY_CREATION_BYTECODE,
+				getSalt(walletClient?.account?.address as Address),
+				getFactoryInitializer(initHash, BLOCK_GUARD_SETTER, BLOCK_SAFE_GUARD),
+			],
+		})
+
+		console.log("Predicted Address- ", address)
+		return { address, initHash }
+	} else {
+		console.log("Wallet Client not connected!")
+		return { address: "0x", initHash: "0x" }
+	}
 }
