@@ -3,6 +3,7 @@ import {
 	concat,
 	concatHex,
 	encodeFunctionData,
+	encodePacked,
 	Hex,
 	hexToBigInt,
 	pad,
@@ -114,18 +115,15 @@ export default async function toTsAccount(walletClient: WalletClient) {
 				callData: userOperation.callData,
 				nonce: userOperation.nonce,
 				initCode: userOperation.initCode ?? "0x",
-				accountGasLimits: toHex(userOperation.callGasLimit),
-				gasFees: toHex(userOperation.maxPriorityFeePerGas),
+				accountGasLimits: toHex(userOperation.callGasLimit, {size:32}),
+				gasFees: toHex(userOperation.maxPriorityFeePerGas, {size:32}),
 				preVerificationGas: userOperation.preVerificationGas,
 			}
 
 			let isDeployed = false
 
 			if (userOperation.factory && userOperation.factoryData) {
-				userOp.initCode = concatHex([
-					userOperation.factory,
-					userOperation.factoryData,
-				])
+				userOp.initCode = await this.getInitCode()
 			}
 			// message.paymasterAndData = getPaymasterAndData(userOperation)
 			isDeployed = !userOperation.factory
@@ -135,6 +133,8 @@ export default async function toTsAccount(walletClient: WalletClient) {
 			if (SAFE_LAUNCHPAD_7579 && !isDeployed) {
 				verifyingContract = userOperation.sender
 			}
+			console.log(userOp)
+
 			const signature = await walletClient.signTypedData({
 				account: owner,
 				domain: getDomain(GUARDIAN_VALIDATOR),
@@ -153,11 +153,9 @@ export default async function toTsAccount(walletClient: WalletClient) {
 				(await isSmartAccountDeployed(walletClient, tsAccountAddress))
 
 			if (safeDeployed) return "0x"
-
-			return concatHex([
-				(await this.getFactory()) ?? "0x",
-				(await this.getFactoryData()) ?? "0x",
-			])
+			const factory = await this.getFactory()
+			const factoryData = await this.getFactoryData()
+			return encodePacked(["address", "bytes"], [factory, factoryData])
 		},
 		async getFactory() {
 			safeDeployed =
@@ -229,4 +227,6 @@ export default async function toTsAccount(walletClient: WalletClient) {
 			return "0x000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
 		},
 	})
+
+	return tsAccount
 }

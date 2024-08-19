@@ -9,9 +9,19 @@ import { publicClient } from "./utils/clients"
 import initialTransactionSend from "./utils/initialTransaction"
 import erc20TxSend from "./utils/erc20TxSend"
 import { ERC20_TOKEN, SAFE_PROXY_FACTORY } from "./utils/constants"
-import { Hex, parseEther } from "viem"
+import {
+	encodeFunctionData,
+	encodePacked,
+	Hex,
+	hexToBigInt,
+	padHex,
+	parseEther,
+} from "viem"
 import getSmartAccount from "./utils/tsSmartAccount"
 import { readContract } from "viem/actions"
+import toTsAccount from "./utils/tsSmartAccount"
+import { getMintCallExecutionData } from "./utils/Encoding"
+import { erc20Abi } from "./utils/abi"
 
 export default function SignButton() {
 	const { smartAccountAddress, initHash, smartAccountClient } =
@@ -25,36 +35,33 @@ export default function SignButton() {
 	async function signTx() {
 		if (viemProvider) {
 			const account = await viemProvider.getAddresses()
-			// const code = await publicClient.getCode({ address: smartAccountAddress })
-			// console.log(code);
 
-			// if (code === undefined) {
-			// 	const hash = await initialTransactionSend(
-			// 		smartAccountAddress,
-			// 		initHash,
-			// 		account[0],
-			// 		viemProvider,
-			// 	)
-			// } else {
-			// 	console.log("Account Already Deployed!!")
-			// 	const hash = await erc20TxSend(
-			// 		ERC20_TOKEN,
-			// 		"3",
-			// 		account[0],
-			// 		smartAccountAddress,
-			// 		account[0],
-			// 		viemProvider,
-			// 	)
+			console.log("Address")
+			console.log(smartAccountClient)
+			console.log("Public Client")
+			console.log(publicClient)
+
+			// const tsAccount = await toTsAccount(viemProvider)
+			// const partialUserOp = {
+			// 	sender: tsAccount.address,
+			// 	nonce: await tsAccount.getNonce(BigInt("0")),
+			// 	factory: await tsAccount.getFactory(),
+			// 	factoryData: await tsAccount.getFactoryData(),
+			// 	callData: getMintCallExecutionData(ERC20_TOKEN, "13"),
+			// 	callGasLimit: hexToBigInt("0x20000002000000"),
+			// 	preVerificationGas: hexToBigInt("0x1000000000"),
+			// 	maxFeePerGas: BigInt("1"),
+			// 	maxPriorityFeePerGas: "0x01",
 			// }
-			
-			
-			
 
-			// console.log("Address")
-			// console.log(smartAccountClient)
-			// const return1 = await smartAccountClient.sendUserOperation(viemProvider, {
-			// 	account: getSmartAccount(viemProvider),
-			// })
+			const return2 = await smartAccountClient.sendTransaction({
+				to: ERC20_TOKEN,
+				data: encodeFunctionData({
+					abi: erc20Abi,
+					functionName: "mint",
+					args: [parseEther("13")],
+				}),
+			})
 		} else {
 			console.log("Viem proivder is null")
 		}

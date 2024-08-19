@@ -1,19 +1,8 @@
 import { createContext, ReactNode, useEffect, useState } from "react"
-import { Address, http, PublicClient, WalletClient } from "viem"
-import { bundlerClient, publicClient } from "./utils/clients"
+import { Address, http } from "viem"
+import { paymasterClient, pimlicoBundlerClient } from "./utils/clients"
+
 import {
-	BLOCK_GUARD_SETTER,
-	BLOCK_SAFE_GUARD,
-	ERC20_TOKEN,
-	SAFE_LAUNCHPAD_7579,
-	SAFE_PROXY_CREATION_BYTECODE,
-	SAFE_PROXY_FACTORY,
-} from "./utils/constants"
-import { launchpadAbi } from "./utils/abi"
-import {
-	getFactoryInitializer,
-	getInitDataForLaunchPadSetup,
-	getSalt,
 	predictTsAddress,
 	predictTsAddressReturn,
 } from "./utils/Encoding"
@@ -25,7 +14,8 @@ import {
 } from "permissionless"
 import { foundry } from "viem/chains"
 import { erc7579Actions } from "permissionless/actions/erc7579"
-import getSmartAccount from "./utils/tsSmartAccount"
+
+import toTsAccount from "./utils/tsSmartAccount"
 
 interface ContextProps {
 	smartAccountAddress: `0x${string}`
@@ -66,7 +56,6 @@ export default function ContractProvider({ children }: ContractProps) {
 
 	const walletClient = useViemProvider(isLogin)
 
-	
 	if (walletClient) {
 		predictTsAddress(walletClient).then((value: predictTsAddressReturn) => {
 			setSAAddress(value.address)
@@ -83,7 +72,7 @@ export default function ContractProvider({ children }: ContractProps) {
 	}
 	useEffect(() => {
 		if (walletClient) {
-			getSmartAccount(walletClient).then((tsAccount) => {
+			toTsAccount(walletClient).then((tsAccount) => {
 				console.log("SmartAccount- ")
 				console.log(tsAccount)
 				const smartAccountClient = createSmartAccountClient({
@@ -91,17 +80,18 @@ export default function ContractProvider({ children }: ContractProps) {
 					entryPoint: ENTRYPOINT_ADDRESS_V07,
 					chain: foundry,
 					bundlerTransport: http("http://localhost:4337"),
-					// middleware: {
-					// 	gasPrice: async () => {
-					// 		return (await bundlerClient.getUserOperationGasPrice()).fast
-					// 	},
-					// 	sponsorUserOperation: bundlerClient.sponsorUserOperatio,
-					// },
+					middleware: {
+						gasPrice: async () => {
+							return (await pimlicoBundlerClient.getUserOperationGasPrice())
+								.fast
+						},
+						sponsorUserOperation: paymasterClient.sponsorUserOperation,
+					},
 				}).extend(erc7579Actions({ entryPoint: ENTRYPOINT_ADDRESS_V07 }))
 				if (smartAccountClient) {
 					console.log("Smart Account Client")
-					console.log(smartAccountClient);
-					
+					console.log(smartAccountClient)
+
 					setSmartAccountClient(smartAccountClient)
 				}
 			})
